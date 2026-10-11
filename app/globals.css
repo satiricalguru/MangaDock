@@ -1,0 +1,245 @@
+@import "tailwindcss";
+@import "@fontsource-variable/unbounded";
+@import "@fontsource-variable/inter";
+
+@theme {
+  --color-ink: #0b0712;
+  --color-ink-2: #140c22;
+  --color-ink-3: #1e1433;
+  --color-paper: #fff7fb;
+  --color-mist: #b9aecb;
+  --color-magenta: #ff2e95;
+  --color-violet: #6120ee;
+  --color-lavender: #ab77ff;
+  --color-cyan: #99ecff;
+  --color-lime: #d4ff3a;
+  --color-amber: #ffac2e;
+
+  --font-display: "Unbounded Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --ease-glide: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+:root {
+  color-scheme: dark;
+  --neon: linear-gradient(100deg, var(--color-magenta), var(--color-lavender) 35%, var(--color-cyan) 70%, var(--color-lime));
+}
+
+html {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+::selection {
+  background: var(--color-magenta);
+  color: white;
+}
+
+@utility text-neon {
+  background: var(--neon);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* room for italic overhang, which background-clip would otherwise cut off */
+  padding-right: 0.12em;
+  margin-right: -0.12em;
+  animation: neon-pan 8s linear infinite;
+}
+
+@utility halftone {
+  background-image: radial-gradient(rgb(255 255 255 / 0.14) 1px, transparent 1.4px);
+  background-size: 7px 7px;
+}
+
+@utility glass {
+  background: rgb(20 12 34 / 0.72);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgb(255 255 255 / 0.1);
+}
+
+@utility speedlines {
+  background: repeating-conic-gradient(from 0deg at 50% 50%, rgb(255 255 255 / 0.07) 0deg 1.2deg, transparent 1.2deg 9deg);
+}
+
+@keyframes neon-pan {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee {
+  animation: marquee 40s linear infinite;
+}
+
+/* Scroll-reveal: pure CSS scroll-driven animation, so React-owned markup is never
+   mutated (no hydration mismatches, nothing left invisible). Browsers without
+   scroll timelines simply show the content. */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.97);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal] {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+
+/* Route change: content glides in */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.page-in {
+  animation: page-in 0.6s var(--ease-glide) both;
+}
+/* opacity only, so fixed and sticky children keep their containing block */
+@keyframes route-in {
+  from {
+    opacity: 0;
+  }
+}
+.route-in {
+  animation: route-in 0.45s ease-out both;
+}
+
+@keyframes fill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@utility shimmer {
+  background: linear-gradient(100deg, rgb(255 255 255 / 0.05) 30%, rgb(255 255 255 / 0.13) 50%, rgb(255 255 255 / 0.05) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* Spinning neon border, used on the auth card */
+@property --spin {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes spin-border {
+  to {
+    --spin: 360deg;
+  }
+}
+@utility neon-border {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -1.5px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(from var(--spin), #ff2e95, #ab77ff, #99ecff, #d4ff3a, #ff2e95);
+    animation: spin-border 6s linear infinite;
+    opacity: 0.85;
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: rgb(17 10 30 / 0.92);
+    backdrop-filter: blur(18px);
+  }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-5px); }
+  40%, 60% { transform: translateX(5px); }
+}
+.shake {
+  animation: shake 0.5s both;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 16px) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+.toast-in {
+  animation: toast-in 0.45s var(--ease-glide) both;
+}
+
+/* Press feedback on buttons and links that look like buttons */
+.press {
+  transition: transform 0.25s var(--ease-glide);
+}
+.press:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee,
+  .text-neon,
+  .page-in,
+  .route-in,
+  .shimmer,
+  .shake,
+  .toast-in,
+  .neon-border::before {
+    animation: none;
+  }
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
