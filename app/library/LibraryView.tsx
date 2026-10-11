@@ -122,7 +122,7 @@ export default function LibraryView({ initialTab }: { initialTab: string }) {
             </Link>
             <button
               onClick={() => remove(l)}
-              className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-ink/80 text-sm opacity-0 backdrop-blur transition hover:bg-magenta group-hover:opacity-100"
+              className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-ink/80 text-sm opacity-0 transition md:backdrop-blur hover:bg-magenta group-hover:opacity-100"
               aria-label={`Remove ${l.title}`}
             >
               ✕

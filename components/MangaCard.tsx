@@ -9,7 +9,7 @@ export default function MangaCard({ m, rank, className = "" }: { m: Media; rank?
       <TiltCard glow={color}>
         <div className="relative aspect-[2/3] bg-ink-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={m.coverImage.extraLarge} alt="" loading="lazy" className="h-full w-full object-cover transition duration-700 ease-glide group-hover:scale-105" />
+          <img src={m.coverImage.large} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-700 ease-glide group-hover:scale-105" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/10 to-transparent" />
           {rank != null && (
             <span className="absolute -bottom-3 left-2 font-display text-7xl font-black italic leading-none text-transparent [-webkit-text-stroke:2px_white]">
@@ -17,7 +17,7 @@ export default function MangaCard({ m, rank, className = "" }: { m: Media; rank?
             </span>
           )}
           <div className="absolute left-2 top-2 flex gap-1.5 text-[10px] font-semibold uppercase tracking-wider">
-            <span className="rounded-full bg-ink/70 px-2 py-1 backdrop-blur">{COUNTRY_LABEL[m.countryOfOrigin ?? "JP"] ?? "Manga"}</span>
+            <span className="rounded-full bg-ink/80 px-2 py-1 md:backdrop-blur">{COUNTRY_LABEL[m.countryOfOrigin ?? "JP"] ?? "Manga"}</span>
             {m.averageScore ? <span className="rounded-full px-2 py-1 text-ink" style={{ background: color }}>★ {m.averageScore / 10}</span> : null}
           </div>
         </div>

@@ -14,7 +14,7 @@ function webglAvailable() {
   }
 }
 
-/** Phones and tablets get the plain video: the WebGL scene can run iOS WebKit out of memory. */
+/** Phones and tablets: the WebGL scene (and even the video) can run iOS WebKit out of memory. */
 function isHandheld() {
   const nav = navigator as Navigator & { deviceMemory?: number };
   const ua = navigator.userAgent;
@@ -29,8 +29,8 @@ function isHandheld() {
 
 /**
  * Fixed full-screen background for the homepage.
- * WebGL scene on capable desktops; the looping video on phones, tablets and weak machines;
- * a still poster when the visitor prefers reduced motion or has Save-Data on.
+ * WebGL scene on capable desktops; the looping video on weak desktops;
+ * a still poster on phones and tablets, with reduced motion, or with Save-Data on.
  */
 export default function HeroBackground({ covers }: { covers: string[] }) {
   const [mode, setMode] = useState<"pending" | "webgl" | "video" | "still">("pending");
@@ -38,8 +38,10 @@ export default function HeroBackground({ covers }: { covers: string[] }) {
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
-    const lowPower = (navigator.hardwareConcurrency ?? 8) <= 2 || isHandheld();
-    setMode(reduced || saveData ? "still" : !lowPower && webglAvailable() ? "webgl" : "video");
+    // phones and tablets get the still poster for now; the video comes back once they're confirmed stable
+    if (reduced || saveData || isHandheld()) return setMode("still");
+    const lowPower = (navigator.hardwareConcurrency ?? 8) <= 2;
+    setMode(!lowPower && webglAvailable() ? "webgl" : "video");
   }, []);
 
   return (
@@ -53,7 +55,11 @@ export default function HeroBackground({ covers }: { covers: string[] }) {
         </video>
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src="/media/hero-poster.jpg" alt="" className="h-full w-full object-cover brightness-[0.5]" />
+        <>
+          <img src="/media/hero-poster.jpg" alt="" className="h-full w-full object-cover" />
+          {/* dimmed with an overlay rather than a filter, which is cheaper on phones */}
+          <div className="absolute inset-0 bg-black/50" />
+        </>
       )}
       <div className="absolute inset-0 bg-gradient-to-b from-ink/30 via-transparent to-ink/80" />
     </div>

@@ -23,7 +23,17 @@ export default function FeaturedCarousel({ items }: { items: Featured[] }) {
   const [paused, setPaused] = useState(false);
   const [tick, setTick] = useState(0); // restarts the progress bar
   const touch = useRef<number | null>(null);
+  // phones mount only the active slide's art; wider screens keep every layer for the crossfade
+  const [wide, setWide] = useState(false);
   const n = items.length;
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px) and (pointer: fine)");
+    const sync = () => setWide(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   const go = useCallback((d: number) => {
     setI((x) => (x + d + n) % n);
@@ -58,10 +68,10 @@ export default function FeaturedCarousel({ items }: { items: Featured[] }) {
         touch.current = null;
       }}
     >
-      <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[32px] border border-white/10 bg-ink-2 shadow-[0_40px_120px_-40px_var(--c)] transition-shadow duration-700" style={{ ["--c" as string]: m.color }} data-reveal>
+      <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[32px] border border-white/10 bg-ink-2 md:shadow-[0_40px_120px_-40px_var(--c)] transition-shadow duration-700" style={{ ["--c" as string]: m.color }} data-reveal>
         {/* art layers crossfade */}
         <div className="absolute inset-0">
-          {items.map((it, k) => (
+          {items.map((it, k) => (wide || k === i) && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               key={it.id}
@@ -70,7 +80,7 @@ export default function FeaturedCarousel({ items }: { items: Featured[] }) {
               className={`absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-[1400ms] ease-glide ${k === i ? "scale-100 opacity-100" : "scale-110 opacity-0"}`}
             />
           ))}
-          <div className="halftone absolute inset-0 opacity-40 mix-blend-overlay" />
+          <div className="halftone absolute inset-0 hidden opacity-40 mix-blend-overlay md:block" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/10 md:bg-gradient-to-r md:from-ink md:via-ink/75 md:to-transparent" />
         </div>
 
@@ -84,7 +94,7 @@ export default function FeaturedCarousel({ items }: { items: Featured[] }) {
             <p className="page-in mt-4 line-clamp-3 text-sm text-paper/80 [animation-delay:160ms] sm:text-base">{m.blurb}</p>
             <div className="page-in mt-5 flex flex-wrap gap-2 [animation-delay:220ms]">
               {m.genres.slice(0, 4).map((g) => (
-                <span key={g} className="rounded-full border border-white/15 bg-ink/40 px-3 py-1 text-xs backdrop-blur">
+                <span key={g} className="rounded-full border border-white/15 bg-ink/60 px-3 py-1 text-xs md:backdrop-blur">
                   {g}
                 </span>
               ))}

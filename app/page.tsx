@@ -118,8 +118,8 @@ export default async function Home() {
         items={d.trending.slice(0, 6).map((m) => ({
           id: m.id,
           title: displayTitle(m),
-          banner: m.bannerImage ?? m.coverImage.extraLarge,
-          cover: m.coverImage.extraLarge,
+          banner: m.bannerImage ?? m.coverImage.large,
+          cover: m.coverImage.large,
           color: m.coverImage.color ?? "#ff2e95",
           blurb: plainText(m.description, 300),
           genres: m.genres,
@@ -178,7 +178,7 @@ export default async function Home() {
 
       {/* READER FEATURES */}
       <section className="relative z-10 overflow-hidden bg-ink px-6 py-24">
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-violet/30 blur-[160px]" />
+        <div className="pointer-events-none absolute hidden md:block left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-violet/30 blur-[160px]" />
         <div className="relative mx-auto max-w-7xl">
           <div className="max-w-2xl" data-reveal>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-magenta">Made for bingeing</p>

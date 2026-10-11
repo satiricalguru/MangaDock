@@ -59,7 +59,9 @@ html.lenis body {
   /* room for italic overhang, which background-clip would otherwise cut off */
   padding-right: 0.12em;
   margin-right: -0.12em;
-  animation: neon-pan 8s linear infinite;
+  @media (min-width: 768px) and (pointer: fine) {
+    animation: neon-pan 8s linear infinite;
+  }
 }
 
 @utility halftone {
@@ -94,8 +96,10 @@ html.lenis body {
   }
 }
 
-.marquee {
-  animation: marquee 40s linear infinite;
+@media (min-width: 768px) and (pointer: fine) {
+  .marquee {
+    animation: marquee 40s linear infinite;
+  }
 }
 
 /* Scroll-reveal: pure CSS scroll-driven animation, so React-owned markup is never
@@ -112,7 +116,8 @@ html.lenis body {
   }
 }
 @supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
+  /* desktop only: on phones every revealed element would become its own animated layer */
+  @media (prefers-reduced-motion: no-preference) and (min-width: 768px) and (pointer: fine) {
     [data-reveal] {
       animation: reveal linear both;
       animation-timeline: view();

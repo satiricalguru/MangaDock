@@ -149,8 +149,12 @@ test.describe("browse filters", () => {
 test.describe("search", () => {
   test("quick search finds a series", async ({ page }) => {
     await page.goto("/");
-    await page.keyboard.press("ControlOrMeta+k");
     const box = page.getByRole("dialog").getByRole("textbox");
+    // the shortcut only works once the page has hydrated, so retry until the dialog opens
+    await expect(async () => {
+      await page.keyboard.press("ControlOrMeta+k");
+      await expect(box).toBeVisible({ timeout: 1000 });
+    }).toPass();
     await box.fill("solo leveling");
     await expect(page.getByRole("dialog").locator("button").first()).toBeVisible();
     await box.press("Enter");

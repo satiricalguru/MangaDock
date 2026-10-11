@@ -27,7 +27,8 @@ export function NavShell({ header, tabbar }: { header: React.ReactNode; tabbar: 
         last = y;
       }
       setScrolled(y > 24);
-      setProgress(max > 0 ? Math.min(y / max, 1) : 0);
+      // rounded so React only re-renders when the bar visibly moves
+      setProgress(max > 0 ? Math.round(Math.min(y / max, 1) * 400) / 400 : 0);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);

@@ -42,8 +42,8 @@ export default async function Browse({ searchParams }: { searchParams: Promise<S
 
   return (
     <div className="relative min-h-dvh overflow-hidden px-6 pb-24 pt-32">
-      <div className="pointer-events-none absolute -left-40 -top-40 h-[480px] w-[480px] rounded-full bg-violet/40 blur-[120px]" />
-      <div className="pointer-events-none absolute -right-40 top-40 h-[420px] w-[420px] rounded-full bg-magenta/30 blur-[120px]" />
+      <div className="pointer-events-none absolute hidden md:block -left-40 -top-40 h-[480px] w-[480px] rounded-full bg-violet/40 blur-[120px]" />
+      <div className="pointer-events-none absolute hidden md:block -right-40 top-40 h-[420px] w-[420px] rounded-full bg-magenta/30 blur-[120px]" />
       <div className="relative mx-auto max-w-7xl">
         <h1 className="font-display text-5xl font-black italic sm:text-7xl">
           {sp.q ? (

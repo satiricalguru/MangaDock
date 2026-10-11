@@ -15,6 +15,8 @@ export default function TunnelCaptions() {
 
   useEffect(() => {
     let raf = 0;
+    // filter blur on huge text is too heavy for phones
+    const blur = window.matchMedia("(min-width: 768px) and (pointer: fine)").matches;
     const loop = () => {
       const el = section.current;
       if (el) {
@@ -27,7 +29,7 @@ export default function TunnelCaptions() {
           const visible = Math.max(0, 1 - Math.abs(local - 0.5) * 2.6);
           node.style.opacity = String(Math.min(visible * 1.6, 1));
           node.style.transform = `translateY(${(0.5 - local) * 120}px) scale(${0.92 + visible * 0.08})`;
-          node.style.filter = `blur(${(1 - visible) * 8}px)`;
+          if (blur) node.style.filter = `blur(${(1 - visible) * 8}px)`;
         });
       }
       raf = requestAnimationFrame(loop);
@@ -45,7 +47,7 @@ export default function TunnelCaptions() {
             ref={(n) => {
               items.current[i] = n;
             }}
-            className="col-start-1 row-start-1 max-w-4xl text-center font-display text-[clamp(2rem,6.5vw,5.5rem)] font-black italic leading-[0.95] opacity-0 will-change-transform"
+            className="col-start-1 row-start-1 max-w-4xl text-center font-display text-[clamp(2rem,6.5vw,5.5rem)] font-black italic leading-[0.95] opacity-0 md:will-change-transform"
           >
             {c.a}
             <br />

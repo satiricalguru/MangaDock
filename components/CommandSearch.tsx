@@ -83,7 +83,7 @@ export default function CommandSearch() {
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center bg-ink/70 px-4 pt-[12vh] backdrop-blur-md" onClick={() => setOpen(false)} data-lenis-prevent>
+    <div className="fixed inset-0 z-[100] flex items-start justify-center bg-ink/90 px-4 pt-[12vh] md:bg-ink/70 md:backdrop-blur-md" onClick={() => setOpen(false)} data-lenis-prevent>
       <div className="glass w-full max-w-xl overflow-hidden rounded-3xl shadow-[0_40px_120px_-20px_#6120ee]" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Search manga">
         <div className="flex items-center gap-3 border-b border-white/10 px-5">
           <span className="text-mist">⌕</span>

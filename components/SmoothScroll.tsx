@@ -16,6 +16,15 @@ export default function SmoothScroll() {
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) document.documentElement.classList.add("reduced");
+    // touch devices keep native scrolling; scrollState still feeds the nav
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      const sync = () => {
+        scrollState.y = window.scrollY;
+        scrollState.screens = window.scrollY / window.innerHeight;
+      };
+      window.addEventListener("scroll", sync, { passive: true });
+      return () => window.removeEventListener("scroll", sync);
+    }
 
     const lenis = new Lenis({ duration: 1.15, smoothWheel: !reduced, autoResize: true });
     lenisRef.current = lenis;

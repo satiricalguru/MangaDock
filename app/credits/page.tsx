@@ -42,7 +42,7 @@ const SECTIONS: { title: string; blurb: string; items: { name: string; url: stri
 export default function Credits() {
   return (
     <div className="relative overflow-hidden px-6 pb-24 pt-32">
-      <div className="pointer-events-none absolute -right-40 -top-20 h-[520px] w-[520px] rounded-full bg-violet/40 blur-[140px]" />
+      <div className="pointer-events-none absolute hidden md:block -right-40 -top-20 h-[520px] w-[520px] rounded-full bg-violet/40 blur-[140px]" />
       <div className="relative mx-auto max-w-5xl">
         <h1 className="font-display text-5xl font-black italic sm:text-7xl">
           Credits <span className="text-neon">&amp; sources</span>

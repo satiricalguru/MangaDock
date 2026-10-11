@@ -8,8 +8,8 @@ export default async function LibraryPage({ searchParams }: { searchParams: Prom
   const [user, { tab, welcome }] = await Promise.all([getUser(), searchParams]);
   return (
     <div className="relative min-h-dvh overflow-hidden px-6 pb-24 pt-32">
-      <div className="pointer-events-none absolute -left-40 -top-32 h-[520px] w-[520px] rounded-full bg-magenta/25 blur-[140px]" />
-      <div className="pointer-events-none absolute -right-40 top-60 h-[480px] w-[480px] rounded-full bg-cyan/20 blur-[140px]" />
+      <div className="pointer-events-none absolute hidden md:block -left-40 -top-32 h-[520px] w-[520px] rounded-full bg-magenta/25 blur-[140px]" />
+      <div className="pointer-events-none absolute hidden md:block -right-40 top-60 h-[480px] w-[480px] rounded-full bg-cyan/20 blur-[140px]" />
       <div className="relative mx-auto max-w-7xl">
         {welcome && (
           <p className="mb-6 inline-block rounded-full bg-lime px-4 py-2 text-sm font-semibold text-ink">Welcome aboard, {user?.name}! Your shelf is ready.</p>
