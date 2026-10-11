@@ -212,7 +212,9 @@ test.describe("accounts", () => {
     // add to favourites
     await page.goto(r.href);
     await page.getByRole("button", { name: /Add to library/ }).click();
+    const saved = page.waitForResponse((res) => res.url().includes("/api/library") && res.request().method() === "POST");
     await page.getByRole("button", { name: /Favourite/ }).click();
+    await saved;
     await page.goto("/library?tab=favorite");
     await expect(page.getByText(name).first()).toBeVisible();
 

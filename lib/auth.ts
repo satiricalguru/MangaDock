@@ -30,7 +30,7 @@ export function verifyPassword(password: string, stored: string) {
 export async function createSession(userId: number) {
   const token = crypto.randomBytes(32).toString("base64url");
   const expires = Date.now() + SESSION_DAYS * 86400_000;
-  db().prepare("INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)").run(token, userId, expires);
+  await db().prepare("INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)").run(token, userId, expires);
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
@@ -43,7 +43,7 @@ export async function createSession(userId: number) {
 export async function destroySession() {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
-  if (token) db().prepare("DELETE FROM sessions WHERE token = ?").run(token);
+  if (token) await db().prepare("DELETE FROM sessions WHERE token = ?").run(token);
   jar.delete(SESSION_COOKIE);
 }
 
@@ -51,11 +51,11 @@ export async function destroySession() {
 export async function getUser(): Promise<User | null> {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
-  const row = db()
+  const row = (await db()
     .prepare(
       `SELECT u.id, u.email, u.name, u.hue, s.expires_at FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ?`,
     )
-    .get(token) as (User & { expires_at: number }) | undefined;
+    .get(token)) as (User & { expires_at: number }) | undefined;
   if (!row || row.expires_at < Date.now()) return null;
   return { id: row.id, email: row.email, name: row.name, hue: row.hue };
 }

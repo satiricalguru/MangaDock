@@ -1,66 +1,13 @@
-// SQLite database for accounts, reading progress and libraries.
-// Uses Node's built-in node:sqlite (no native add-on to compile, so it deploys anywhere).
-// The file lives in ./data (git-ignored) and is created on first use.
+// Database for accounts, reading progress and libraries.
+// On Vercel this is Turso (hosted SQLite, set up through the Vercel Marketplace,
+// which provides TURSO_DATABASE_URL and TURSO_AUTH_TOKEN). Without those it falls
+// back to a local SQLite file in ./data (git-ignored), created on first use.
 
-import { DatabaseSync, type StatementSync } from "node:sqlite";
+import { createClient, type Client, type InStatement, type InValue } from "@libsql/client";
 import fs from "node:fs";
 import path from "node:path";
 
-type Param = null | number | bigint | string | Uint8Array;
-
-/** The small slice of the better-sqlite3 statement API the app uses. */
-class Stmt {
-  constructor(private s: StatementSync, private plucked = false) {
-    (s as { setAllowUnknownNamedParameters?: (v: boolean) => void }).setAllowUnknownNamedParameters?.(true);
-  }
-  pluck() {
-    return new Stmt(this.s, true);
-  }
-  run(...args: any[]) {
-    return this.s.run(...(args as Param[]));
-  }
-  get(...args: any[]): any {
-    const row = this.s.get(...(args as Param[])) as Record<string, unknown> | undefined;
-    return this.plucked && row ? Object.values(row)[0] : row;
-  }
-  all(...args: any[]): any[] {
-    const rows = this.s.all(...(args as Param[])) as Record<string, unknown>[];
-    return this.plucked ? rows.map((r) => Object.values(r)[0]) : rows;
-  }
-}
-
-class Db {
-  constructor(private raw: DatabaseSync) {}
-  prepare(sql: string) {
-    return new Stmt(this.raw.prepare(sql));
-  }
-  exec(sql: string) {
-    this.raw.exec(sql);
-  }
-  transaction<A extends unknown[], R>(fn: (...a: A) => R) {
-    return (...a: A): R => {
-      this.raw.exec("BEGIN");
-      try {
-        const r = fn(...a);
-        this.raw.exec("COMMIT");
-        return r;
-      } catch (e) {
-        this.raw.exec("ROLLBACK");
-        throw e;
-      }
-    };
-  }
-}
-
-const g = globalThis as unknown as { __niDb?: Db };
-
-function open() {
-  // Vercel functions can only write to /tmp, which resets between cold starts.
-  const dir = process.env.VERCEL ? "/tmp/neonink" : path.join(process.cwd(), "data");
-  fs.mkdirSync(dir, { recursive: true });
-  const db = new Db(new DatabaseSync(path.join(dir, "neonink.db")));
-  db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;");
-  db.exec(`
+const SCHEMA = `
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT NOT NULL UNIQUE COLLATE NOCASE,
@@ -104,8 +51,65 @@ function open() {
       added_at INTEGER NOT NULL,
       PRIMARY KEY (user_id, manga_id)
     );
-  `);
-  return db;
+  `;
+
+const g = globalThis as unknown as { __niDb?: Promise<Client> };
+
+async function open() {
+  const remote = process.env.TURSO_DATABASE_URL;
+  let client: Client;
+  if (remote) {
+    client = createClient({ url: remote, authToken: process.env.TURSO_AUTH_TOKEN });
+  } else {
+    // Vercel functions can only write to /tmp, which resets between cold starts.
+    const dir = process.env.VERCEL ? "/tmp/neonink" : path.join(process.cwd(), "data");
+    fs.mkdirSync(dir, { recursive: true });
+    client = createClient({ url: `file:${path.join(dir, "neonink.db")}` });
+    await client.execute("PRAGMA foreign_keys = ON");
+  }
+  await client.executeMultiple(SCHEMA);
+  return client;
 }
 
-export const db = () => (g.__niDb ??= open());
+function client() {
+  return (g.__niDb ??= open().catch((err) => {
+    g.__niDb = undefined;
+    throw err;
+  }));
+}
+
+type Args = InValue[] | Record<string, InValue>;
+const toArgs = (a: unknown[]): Args =>
+  a.length === 1 && a[0] !== null && typeof a[0] === "object" && !(a[0] instanceof Uint8Array) ? (a[0] as Record<string, InValue>) : (a as InValue[]);
+
+/** A small, async take on the better-sqlite3 statement API the app was written against. */
+class Stmt {
+  constructor(private sql: string, private plucked = false) {}
+  pluck() {
+    return new Stmt(this.sql, true);
+  }
+  /** The statement with its arguments, for db().batch(). */
+  bind(...args: unknown[]): InStatement {
+    return { sql: this.sql, args: toArgs(args) };
+  }
+  async run(...args: unknown[]) {
+    const rs = await (await client()).execute(this.bind(...args));
+    return { changes: rs.rowsAffected, lastInsertRowid: rs.lastInsertRowid ?? 0n };
+  }
+  async get(...args: unknown[]): Promise<any> {
+    return (await this.all(...args))[0];
+  }
+  async all(...args: unknown[]): Promise<any[]> {
+    const rs = await (await client()).execute(this.bind(...args));
+    const rows = rs.rows.map((r) => Object.fromEntries(rs.columns.map((c, i) => [c, r[i]])));
+    return this.plucked ? rows.map((r) => Object.values(r)[0]) : rows;
+  }
+}
+
+export const db = () => ({
+  prepare: (sql: string) => new Stmt(sql),
+  /** Runs statements in one transaction. */
+  batch: async (stmts: InStatement[]) => {
+    if (stmts.length) await (await client()).batch(stmts, "write");
+  },
+});

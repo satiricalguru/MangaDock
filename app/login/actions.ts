@@ -25,11 +25,11 @@ export async function signup(_: AuthState, form: FormData): Promise<AuthState> {
   if (name.length < 2 || name.length > 32) return { error: "Pick a display name between 2 and 32 characters.", fields };
   if (password.length < 8) return { error: "Use at least 8 characters for your password.", fields };
 
-  const exists = db().prepare("SELECT 1 FROM users WHERE email = ?").get(email);
+  const exists = await db().prepare("SELECT 1 FROM users WHERE email = ?").get(email);
   if (exists) return { error: "That email already has an account. Log in instead.", fields };
 
   const hue = Math.floor(Math.random() * 360);
-  const { lastInsertRowid } = db()
+  const { lastInsertRowid } = await db()
     .prepare("INSERT INTO users (email, name, password_hash, hue, created_at) VALUES (?, ?, ?, ?, ?)")
     .run(email, name, hashPassword(password), hue, Date.now());
   await createSession(Number(lastInsertRowid));
@@ -39,7 +39,7 @@ export async function signup(_: AuthState, form: FormData): Promise<AuthState> {
 export async function login(_: AuthState, form: FormData): Promise<AuthState> {
   const email = String(form.get("email") ?? "").trim();
   const password = String(form.get("password") ?? "");
-  const row = db().prepare("SELECT id, password_hash FROM users WHERE email = ?").get(email) as
+  const row = (await db().prepare("SELECT id, password_hash FROM users WHERE email = ?").get(email)) as
     | { id: number; password_hash: string }
     | undefined;
   if (!row || !verifyPassword(password, row.password_hash)) {

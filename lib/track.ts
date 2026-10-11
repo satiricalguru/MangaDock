@@ -66,7 +66,7 @@ export async function setLibrary(mangaId: number, status: LibraryStatus | null, 
   if (status) all[mangaId] = { mangaId, status, title, cover, addedAt: all[mangaId]?.addedAt ?? Date.now() };
   else delete all[mangaId];
   save(K.library, all);
-  await fetch("/api/library", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mangaId, status, title, cover }) }).catch(() => {});
+  await fetch("/api/library", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mangaId, status, title, cover }), keepalive: true }).catch(() => {});
 }
 
 export async function getLibrary(): Promise<{ signedIn: boolean; items: LibraryItem[] }> {
