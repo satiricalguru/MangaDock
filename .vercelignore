@@ -1,0 +1,6 @@
+data
+.audit
+test-report
+test-results
+.next
+*.tsbuildinfo

@@ -1,19 +1,65 @@
-// Local SQLite database for accounts, reading progress and libraries.
+// SQLite database for accounts, reading progress and libraries.
+// Uses Node's built-in node:sqlite (no native add-on to compile, so it deploys anywhere).
 // The file lives in ./data (git-ignored) and is created on first use.
 
-import Database from "better-sqlite3";
+import { DatabaseSync, type StatementSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
 
-const g = globalThis as unknown as { __niDb?: Database.Database };
+type Param = null | number | bigint | string | Uint8Array;
+
+/** The small slice of the better-sqlite3 statement API the app uses. */
+class Stmt {
+  constructor(private s: StatementSync, private plucked = false) {
+    (s as { setAllowUnknownNamedParameters?: (v: boolean) => void }).setAllowUnknownNamedParameters?.(true);
+  }
+  pluck() {
+    return new Stmt(this.s, true);
+  }
+  run(...args: any[]) {
+    return this.s.run(...(args as Param[]));
+  }
+  get(...args: any[]): any {
+    const row = this.s.get(...(args as Param[])) as Record<string, unknown> | undefined;
+    return this.plucked && row ? Object.values(row)[0] : row;
+  }
+  all(...args: any[]): any[] {
+    const rows = this.s.all(...(args as Param[])) as Record<string, unknown>[];
+    return this.plucked ? rows.map((r) => Object.values(r)[0]) : rows;
+  }
+}
+
+class Db {
+  constructor(private raw: DatabaseSync) {}
+  prepare(sql: string) {
+    return new Stmt(this.raw.prepare(sql));
+  }
+  exec(sql: string) {
+    this.raw.exec(sql);
+  }
+  transaction<A extends unknown[], R>(fn: (...a: A) => R) {
+    return (...a: A): R => {
+      this.raw.exec("BEGIN");
+      try {
+        const r = fn(...a);
+        this.raw.exec("COMMIT");
+        return r;
+      } catch (e) {
+        this.raw.exec("ROLLBACK");
+        throw e;
+      }
+    };
+  }
+}
+
+const g = globalThis as unknown as { __niDb?: Db };
 
 function open() {
   // Vercel functions can only write to /tmp, which resets between cold starts.
   const dir = process.env.VERCEL ? "/tmp/neonink" : path.join(process.cwd(), "data");
   fs.mkdirSync(dir, { recursive: true });
-  const db = new Database(path.join(dir, "neonink.db"));
-  db.pragma("journal_mode = WAL");
-  db.pragma("foreign_keys = ON");
+  const db = new Db(new DatabaseSync(path.join(dir, "neonink.db")));
+  db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;");
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
