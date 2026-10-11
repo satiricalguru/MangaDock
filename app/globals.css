@@ -67,11 +67,15 @@ html.lenis body {
   background-size: 7px 7px;
 }
 
+/* Solid on small screens: stacked backdrop blurs cost a lot of GPU memory on phones. */
 @utility glass {
-  background: rgb(20 12 34 / 0.72);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  background: rgb(20 12 34 / 0.94);
   border: 1px solid rgb(255 255 255 / 0.1);
+  @media (min-width: 768px) {
+    background: rgb(20 12 34 / 0.72);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+  }
 }
 
 @utility speedlines {
@@ -101,12 +105,10 @@ html.lenis body {
   from {
     opacity: 0;
     transform: translateY(40px) scale(0.97);
-    filter: blur(6px);
   }
   to {
     opacity: 1;
     transform: none;
-    filter: none;
   }
 }
 @supports (animation-timeline: view()) {
@@ -195,7 +197,9 @@ html.lenis body {
     z-index: -1;
     border-radius: inherit;
     background: rgb(17 10 30 / 0.92);
-    backdrop-filter: blur(18px);
+    @media (min-width: 768px) {
+      backdrop-filter: blur(18px);
+    }
   }
 }
 

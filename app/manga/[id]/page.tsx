@@ -41,7 +41,7 @@ export default async function MangaPage({ params, searchParams }: { params: Prom
     <div className="relative">
       <div className="relative h-[52vh] min-h-80 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={m.bannerImage ?? m.coverImage.extraLarge} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover blur-[2px]" />
+        <img src={m.bannerImage ?? m.coverImage.extraLarge} alt="" className="absolute inset-0 h-full w-full object-cover md:scale-110 md:blur-[2px]" />
         <div className="halftone absolute inset-0 mix-blend-overlay" />
         <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, transparent, ${color}33 40%, #0b0712 100%)` }} />
       </div>

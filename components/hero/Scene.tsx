@@ -129,11 +129,14 @@ function CameraRig({ depth }: { depth: number }) {
   return null;
 }
 
-export default function Scene({ covers }: { covers: string[] }) {
+const MAX_COVERS = 12;
+
+export default function Scene({ covers: all }: { covers: string[] }) {
+  const covers = all.slice(0, MAX_COVERS);
   const depth = covers.length * SPACING;
   return (
     <Canvas
-      dpr={[1, 1.75]}
+      dpr={[1, 1.5]}
       camera={{ position: [0, 0, 6], fov: 55, near: 0.1, far: 80 }}
       gl={{ antialias: true, powerPreference: "high-performance" }}
     >

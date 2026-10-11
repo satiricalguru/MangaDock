@@ -84,7 +84,7 @@ export default function MangaActions({ mangaId, title, cover, color }: { mangaId
       </div>
       {toast &&
         createPortal(
-        <div key={toast.id} role="status" className="toast-in fixed bottom-24 left-1/2 z-[60] rounded-full border border-white/15 bg-ink/90 px-5 py-3 text-sm font-semibold shadow-[0_10px_40px_-10px_#ff2e95] backdrop-blur-xl md:bottom-8">
+        <div key={toast.id} role="status" className="toast-in fixed bottom-24 left-1/2 z-[60] rounded-full border border-white/15 bg-ink/90 px-5 py-3 text-sm font-semibold shadow-[0_10px_40px_-10px_#ff2e95] md:bottom-8 md:backdrop-blur-xl">
           {toast.text}
         </div>,
           document.body,

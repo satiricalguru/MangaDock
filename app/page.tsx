@@ -58,7 +58,7 @@ async function loadHome() {
 
 export default async function Home() {
   const d = await loadHome();
-  const covers = d.trending.slice(0, 18).map((m) => proxied(m.coverImage.large));
+  const covers = d.trending.slice(0, 12).map((m) => proxied(m.coverImage.large));
 
   return (
     <>

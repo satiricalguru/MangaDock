@@ -14,18 +14,32 @@ function webglAvailable() {
   }
 }
 
+/** Phones and tablets get the plain video: the WebGL scene can run iOS WebKit out of memory. */
+function isHandheld() {
+  const nav = navigator as Navigator & { deviceMemory?: number };
+  const ua = navigator.userAgent;
+  const ios = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  return (
+    ios ||
+    window.matchMedia("(pointer: coarse)").matches ||
+    window.matchMedia("(max-width: 900px)").matches ||
+    (nav.deviceMemory !== undefined && nav.deviceMemory <= 4)
+  );
+}
+
 /**
  * Fixed full-screen background for the homepage.
- * WebGL scene when the device can handle it; the looping video otherwise;
- * a still poster when the visitor prefers reduced motion.
+ * WebGL scene on capable desktops; the looping video on phones, tablets and weak machines;
+ * a still poster when the visitor prefers reduced motion or has Save-Data on.
  */
 export default function HeroBackground({ covers }: { covers: string[] }) {
   const [mode, setMode] = useState<"pending" | "webgl" | "video" | "still">("pending");
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const lowPower = (navigator.hardwareConcurrency ?? 8) <= 2;
-    setMode(reduced ? "still" : webglAvailable() && !lowPower ? "webgl" : "video");
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    const lowPower = (navigator.hardwareConcurrency ?? 8) <= 2 || isHandheld();
+    setMode(reduced || saveData ? "still" : !lowPower && webglAvailable() ? "webgl" : "video");
   }, []);
 
   return (
