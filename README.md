@@ -15,7 +15,13 @@
   <a href="#features">Features</a> ·
   <a href="#screenshots">Screenshots</a> ·
   <a href="#catalog-index">Catalog index</a> ·
-  <a href="#rules-we-follow">Rules</a>
+  <a href="#rules-we-follow">Rules</a> ·
+  <a href="#contributors">Contributors</a>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-d4ff3a"></a>
+  <a href="CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-ff2e95"></a>
 </p>
 
 <p align="center">
@@ -119,4 +125,17 @@ Titles added since the last build still work: they fall back to a live MangaDex 
 | `scripts/icons.mjs` | Renders the icon PNGs from `app/icon.svg` |
 | `scripts/readme-media.mjs` | Captures the screenshots, GIF and video in `docs/media` |
 
-Cover art in the screenshots belongs to its creators and publishers; it's shown as it appears on the live site, served from AniList and MangaDex.
+## Contributors
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/satiricalguru"><img src="https://github.com/satiricalguru.png?size=100" width="80" alt=""><br><b>satiricalguru</b></a><br>Creator · maintainer</td>
+    <td align="center"><a href="https://github.com/Mxhi-04"><img src="https://github.com/Mxhi-04.png?size=100" width="80" alt=""><br><b>Mxhi-04</b></a><br>Collaborator</td>
+  </tr>
+</table>
+
+Want to help? Read [CONTRIBUTING.md](CONTRIBUTING.md). Thanks also to the AniList, Jikan and MangaDex teams, and to the scanlation groups credited on every chapter.
+
+## License
+
+[MIT](LICENSE) for MangaDock's code, icon and design. Cover art in the screenshots belongs to its creators and publishers; it's shown as it appears on the live site, served from AniList and MangaDex.
