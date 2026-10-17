@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://mangadock.vercel.app"><b>Open MangaDock ↗</b></a> ·
   <a href="#run-it">Run it</a> ·
   <a href="#features">Features</a> ·
   <a href="#screenshots">Screenshots</a> ·
