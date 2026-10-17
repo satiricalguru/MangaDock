@@ -22,8 +22,8 @@ npm run test:e2e # optional, Playwright
 ## Good first contributions
 
 - Test the homepage and reader on a real iPhone or Android phone and report anything that stutters or crashes.
-- Add a reader setting (e.g. right-to-left paging for manga).
 - Improve matching for titles that show "couldn't find this on MangaDex".
+- Add double-page spread view option in the reader for desktop widescreen monitors.
 - Rebuild the catalog index (`node scripts/build-catalog.mjs`) and open a PR with the new numbers.
 - Accessibility fixes: keyboard focus, contrast, screen-reader labels.
 

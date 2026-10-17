@@ -20,6 +20,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/satiricalguru/MangaDock/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/satiricalguru/MangaDock/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-d4ff3a"></a>
   <a href="CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-ff2e95"></a>
 </p>
@@ -37,7 +38,7 @@
   - **Readable now** (`?src=md`): straight from MangaDex, so every result opens in the reader. That includes about 16,000 English series AniList doesn't list.
 - **Title pages** (`/manga/[anilistId]`): AniList info, the MyAnimeList score (via Jikan), characters, official reading links, recommendations and chapters from MangaDex in every available language.
 - **MangaDex-only titles** (`/title/[mangadexId]`): info, chapters, library and reading progress for series that aren't on AniList.
-- **Reader** (`/read/[chapterId]`): strip or paged mode, progress bar, width slider, data-saver mode, ← → keys between chapters, and scanlation-group credits on every chapter.
+- **Reader** (`/read/[chapterId]`): strip or paged mode with Right-to-Left (RTL) manga pagination support, progress bar, width slider, data-saver mode, ← → keys between chapters, and scanlation-group credits on every chapter.
 - **Library and progress:** reading, plan to read, completed and favourites. Progress is saved to the page, in the browser for guests and to your account when signed in.
 - **Quick search:** press `/` or ⌘K anywhere. Results come from AniList and MangaDex together.
 - **Installable:** add it to your phone's home screen and it opens full-screen with its own icon.
