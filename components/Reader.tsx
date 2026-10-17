@@ -21,6 +21,7 @@ interface Props {
 }
 
 type Mode = "strip" | "paged";
+type Direction = "ltr" | "rtl";
 
 function readPref<T extends string>(key: string, fallback: T): T {
   try {
@@ -34,6 +35,7 @@ export default function Reader(props: Props) {
   const { chapterId, chapterNum, pages, startPage, series, title, backHref, prevHref, nextHref, saverHref, dataSaver, credits } = props;
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("strip");
+  const [direction, setDirection] = useState<Direction>("ltr");
   const [width, setWidth] = useState(760);
   const [page, setPage] = useState(Math.min(startPage, Math.max(pages.length - 1, 0)));
   const [failed, setFailed] = useState<Set<number>>(new Set());
@@ -45,14 +47,16 @@ export default function Reader(props: Props) {
 
   useEffect(() => {
     setMode(readPref<Mode>("ni:mode", "strip"));
+    setDirection(readPref<Direction>("ni:direction", "ltr"));
     setWidth(Number(readPref("ni:width", "760")) || 760);
   }, []);
   useEffect(() => {
     try {
       localStorage.setItem("ni:mode", mode);
+      localStorage.setItem("ni:direction", direction);
       localStorage.setItem("ni:width", String(width));
     } catch {}
-  }, [mode, width]);
+  }, [mode, direction, width]);
 
   // --- progress tracking -------------------------------------------------
   const persist = useCallback(
@@ -129,16 +133,20 @@ export default function Reader(props: Props) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement)?.tagName === "INPUT") return;
-      if (e.key === "ArrowRight" || (mode === "paged" && e.key === " ")) {
+      const forwardKey = direction === "rtl" ? "ArrowLeft" : "ArrowRight";
+      const backKey = direction === "rtl" ? "ArrowRight" : "ArrowLeft";
+
+      if (e.key === forwardKey || (mode === "paged" && e.key === " ")) {
         e.preventDefault();
         go(1);
       }
-      if (e.key === "ArrowLeft") go(-1);
+      if (e.key === backKey) go(-1);
       if (e.key === "m") setMode((m) => (m === "strip" ? "paged" : "strip"));
+      if (e.key === "r" && mode === "paged") setDirection((d) => (d === "ltr" ? "rtl" : "ltr"));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [go, mode]);
+  }, [go, mode, direction]);
 
   const progress = pages.length ? (page + 1) / pages.length : 0;
   const retry = (i: number) => {
@@ -203,6 +211,15 @@ export default function Reader(props: Props) {
             </button>
           ))}
         </div>
+        {mode === "paged" && (
+          <button
+            onClick={() => setDirection((d) => (d === "ltr" ? "rtl" : "ltr"))}
+            title={`Reading direction: ${direction.toUpperCase()} (click or press R to toggle)`}
+            className="flex min-h-9 shrink-0 items-center rounded-full bg-white/5 px-2.5 text-xs font-semibold text-mist hover:text-white sm:px-3"
+          >
+            {direction.toUpperCase()}
+          </button>
+        )}
         <label className="hidden items-center gap-2 text-xs text-mist md:flex">
           <input type="range" min={480} max={1100} value={width} onChange={(e) => setWidth(Number(e.target.value))} className="w-20 accent-magenta" aria-label="Page width" />
         </label>
@@ -241,8 +258,17 @@ export default function Reader(props: Props) {
         <div className="relative mx-auto mt-8" style={{ maxWidth: width }}>
           {pageImg(pages[page], page, true)}
           {/* tap zones */}
-          <button aria-label="Previous page" onClick={() => go(-1)} className="absolute inset-y-0 left-0 w-1/3 cursor-w-resize" />
-          <button aria-label="Next page" onClick={() => go(1)} className="absolute inset-y-0 right-0 w-2/3 cursor-e-resize" />
+          {direction === "rtl" ? (
+            <>
+              <button aria-label="Next page" onClick={() => go(1)} className="absolute inset-y-0 left-0 w-2/3 cursor-w-resize" />
+              <button aria-label="Previous page" onClick={() => go(-1)} className="absolute inset-y-0 right-0 w-1/3 cursor-e-resize" />
+            </>
+          ) : (
+            <>
+              <button aria-label="Previous page" onClick={() => go(-1)} className="absolute inset-y-0 left-0 w-1/3 cursor-w-resize" />
+              <button aria-label="Next page" onClick={() => go(1)} className="absolute inset-y-0 right-0 w-2/3 cursor-e-resize" />
+            </>
+          )}
           {/* preload the next two pages */}
           <div className="hidden">
             {pages.slice(page + 1, page + 3).map((src) => (
@@ -271,7 +297,9 @@ export default function Reader(props: Props) {
           ) : null}
         </div>
         <p className="text-xs text-mist">{credits}</p>
-        <p className="text-xs text-mist/60">← → change {mode === "paged" ? "pages" : "chapters"} · M switches strip / paged · double-click hides the toolbar</p>
+        <p className="text-xs text-mist/60">
+          ← → change {mode === "paged" ? (direction === "rtl" ? "pages (RTL: ← next, → prev)" : "pages") : "chapters"} · M switches strip / paged {mode === "paged" ? "· R toggles LTR/RTL" : ""} · double-click hides the toolbar
+        </p>
       </div>
     </div>
   );
