@@ -29,7 +29,7 @@ for (const [name, path, scroll] of [
 }
 
 // Phone: stills plus a scroll recording of the homepage
-const phone = await browser.newContext({ ...devices["iPhone 13"], recordVideo: { dir: `${OUT}/raw`, size: { width: 390, height: 844 } } });
+const phone = await browser.newContext({ ...devices["iPhone 13"], recordVideo: { dir: `${OUT}/raw`, size: devices["iPhone 13"].viewport } });
 const p = await phone.newPage();
 await p.goto(BASE + "/", { waitUntil: "networkidle", timeout: 90000 });
 await wait(3000);
