@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-3">
         <div>
           <p className="font-display text-2xl font-black italic text-paper">
-            NEON<span className="text-neon">INK</span>
+            MANGA<span className="text-neon">DOCK</span>
           </p>
           <p className="mt-3 max-w-xs">A free, ad-free fan site for discovering and reading manga, manhwa and manhua.</p>
         </div>
@@ -28,7 +28,7 @@ export default function Footer() {
         </div>
       </div>
       <p className="mx-auto mt-12 max-w-7xl text-xs text-mist/60">
-        Neon Ink hosts no files. Chapters are served by MangaDex@Home and credited to their scanlation groups. Support the
+        MangaDock hosts no files. Chapters are served by MangaDex@Home and credited to their scanlation groups. Support the
         creators by reading on official platforms when a series is licensed.
       </p>
     </footer>

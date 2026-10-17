@@ -1,4 +1,4 @@
-# Neon Ink
+# MangaDock
 
 A free, ad-free anime-style site for discovering and reading manga, manhwa and manhua.
 
@@ -38,7 +38,7 @@ Production: `npm run build && npm start`, or deploy the folder to Vercel.
 | `lib/anilist.ts`, `lib/jikan.ts`, `lib/mangadex.ts` | API clients |
 | `app/api/img` | Same-origin image proxy so WebGL can use covers as textures |
 | `public/media/` | Gemini hero video (seamless 8.5s loop, MP4 + WebM) and poster |
-| `app/globals.css` | Neon Ink colour tokens and utilities |
+| `app/globals.css` | MangaDock colour tokens and utilities |
 | `scripts/build-catalog.mjs` | Crawls all of MangaDex and writes `lib/data/catalog.json` |
 | `lib/catalog.ts` | Reads that index: AniList/MAL id → MangaDex id, and whether English chapters exist |
 

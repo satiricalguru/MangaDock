@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     return new Response("host not allowed", { status: 403 });
   }
   // image servers sometimes drop the connection; retry, and answer 502 rather than crash
-  const upstream = await fetchRetry(target.href, { headers: { "User-Agent": "NeonInk/0.2" } }, 3, 15000).catch(() => null);
+  const upstream = await fetchRetry(target.href, { headers: { "User-Agent": "MangaDock/0.2" } }, 3, 15000).catch(() => null);
   if (!upstream?.ok || !upstream.body) return new Response("upstream error", { status: 502 });
   return new Response(upstream.body, {
     headers: {

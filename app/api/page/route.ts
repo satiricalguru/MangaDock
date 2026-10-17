@@ -7,7 +7,7 @@ import "@/lib/dns";
 
 export const dynamic = "force-dynamic";
 
-const UA = "NeonInk/0.2 (free fan site; non-commercial)";
+const UA = "MangaDock/0.2 (free fan site; non-commercial)";
 const allowed = (h: string) => h.endsWith(".mangadex.network") || h === "uploads.mangadex.org";
 
 function report(url: string, success: boolean, bytes: number, duration: number, cached: boolean) {

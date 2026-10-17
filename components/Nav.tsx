@@ -25,9 +25,9 @@ function Avatar({ user, size = 36 }: { user: User; size?: number }) {
 export default function Nav({ user }: { user: User | null }) {
   const header = (
     <nav className="glass mx-auto flex max-w-7xl items-center gap-2 rounded-full py-1.5 pl-4 pr-1.5 transition-shadow sm:pl-5">
-      <Link href="/" className="group mr-1 flex items-center gap-1 font-display text-lg font-black italic tracking-tight" aria-label="Neon Ink home">
-        <span className="transition group-hover:-skew-x-12">NEON</span>
-        <span className="text-neon">INK</span>
+      <Link href="/" className="group mr-1 flex items-center gap-1 font-display text-lg font-black italic tracking-tight" aria-label="MangaDock home">
+        <span className="transition group-hover:-skew-x-12">MANGA</span>
+        <span className="text-neon">DOCK</span>
       </Link>
       <div className="ml-auto hidden items-center gap-1 text-sm text-mist lg:flex">
         {LINKS.map((l) => (

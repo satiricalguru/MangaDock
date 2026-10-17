@@ -9,7 +9,7 @@ import { lookup } from "./catalog";
 import type { Media } from "./anilist";
 
 const API = "https://api.mangadex.org";
-const UA = "NeonInk/0.2 (free fan site; non-commercial)";
+const UA = "MangaDock/0.2 (free fan site; non-commercial)";
 const RATINGS = ["safe", "suggestive"];
 
 async function md<T>(path: string, ttlMs = 10 * 60_000): Promise<T> {

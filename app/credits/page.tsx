@@ -48,7 +48,7 @@ export default function Credits() {
           Credits <span className="text-neon">&amp; sources</span>
         </h1>
         <p className="mt-4 max-w-2xl text-mist">
-          Neon Ink is free and ad-free. It hosts no files: everything here is pulled from these communities and platforms, with credit.
+          MangaDock is free and ad-free. It hosts no files: everything here is pulled from these communities and platforms, with credit.
         </p>
         {SECTIONS.map((s) => (
           <section key={s.title} className="mt-16" data-reveal suppressHydrationWarning>

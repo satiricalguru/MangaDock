@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const API = "https://api.mangadex.org";
-const UA = "NeonInk/0.2 (free fan site; non-commercial; catalog index)";
+const UA = "MangaDock/0.2 (free fan site; non-commercial; catalog index)";
 const OUT = path.join(import.meta.dirname, "..", "lib", "data", "catalog.json");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

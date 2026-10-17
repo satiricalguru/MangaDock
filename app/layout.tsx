@@ -9,7 +9,7 @@ import SyncOnLogin from "@/components/SyncOnLogin";
 import { getUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: { default: "Neon Ink · Read manga, manhwa & manhua", template: "%s · Neon Ink" },
+  title: { default: "MangaDock · Read manga, manhwa & manhua", template: "%s · MangaDock" },
   description: "A free, colourful home for discovering and reading manga, manhwa and manhua.",
 };
 

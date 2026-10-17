@@ -196,7 +196,7 @@ test.describe("title pages and reader", () => {
 
 test.describe("accounts", () => {
   test("sign up, reading progress is saved, log out and back in", async ({ page }) => {
-    const email = `test${Date.now()}@neonink.test`;
+    const email = `test${Date.now()}@mangadock.test`;
     await page.goto("/login?mode=signup");
     await page.getByLabel("Display name").fill("Tester");
     await page.getByLabel("Email").fill(email);
@@ -236,7 +236,7 @@ test.describe("accounts", () => {
 
   test("wrong password shows an error", async ({ page }) => {
     await page.goto("/login");
-    await page.getByLabel("Email").fill("nobody@neonink.test");
+    await page.getByLabel("Email").fill("nobody@mangadock.test");
     await page.getByLabel("Password", { exact: true }).fill("wrongpass");
     await page.getByRole("button", { name: "Log in", exact: true }).last().click();
     await expect(page.getByRole("alert").filter({ hasText: "wrong" })).toBeVisible();
