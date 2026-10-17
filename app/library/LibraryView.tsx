@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getContinue, getLibrary, progressHref, setLibrary } from "@/lib/track";
 import type { LibraryItem, ProgressItem } from "@/lib/types";
+import { seriesHref } from "@/lib/ui";
 
 const TABS = [
   { id: "continue", label: "Continue reading" },
@@ -113,7 +114,7 @@ export default function LibraryView({ initialTab }: { initialTab: string }) {
       <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
         {items.map((l) => (
           <div key={l.mangaId} className="group relative">
-            <Link href={`/manga/${l.mangaId}`} className="block">
+            <Link href={seriesHref(l.mangaId, l.cover)} className="block">
               <div className="aspect-[2/3] overflow-hidden rounded-[18px] bg-ink-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={l.cover} alt="" className="h-full w-full object-cover transition duration-700 ease-glide group-hover:scale-105" />

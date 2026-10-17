@@ -68,7 +68,7 @@ export default function FeaturedCarousel({ items }: { items: Featured[] }) {
         touch.current = null;
       }}
     >
-      <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[32px] border border-white/10 bg-ink-2 md:shadow-[0_40px_120px_-40px_var(--c)] transition-shadow duration-700" style={{ ["--c" as string]: m.color }} data-reveal>
+      <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[32px] border border-white/10 bg-ink-2 md:shadow-[0_40px_120px_-40px_var(--c)] transition-shadow duration-700" style={{ ["--c" as string]: m.color }} data-reveal suppressHydrationWarning>
         {/* art layers crossfade */}
         <div className="absolute inset-0">
           {items.map((it, k) => (wide || k === i) && (

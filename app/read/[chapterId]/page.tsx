@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Reader from "@/components/Reader";
 import { displayTitle, getManga } from "@/lib/anilist";
-import { getChapter, getChapters, getPages } from "@/lib/mangadex";
+import { getChapter, getChapters, getMdTitle, getPages, mdKey } from "@/lib/mangadex";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Reader" };
@@ -32,19 +32,26 @@ export default async function ReadPage({
     );
   }
 
-  const anilistId = Number(m) || null;
+  // m is the AniList id, or a negative key for titles that only exist on MangaDex (see mdKey)
+  const key = Number(m) || null;
+  const anilistId = key && key > 0 ? key : null;
+  const mdOnly = !!(key && key < 0 && chapter.mangaId && mdKey(chapter.mangaId) === key);
   const dataSaver = saver === "1";
   const [pages, list, series] = await Promise.all([
     getPages(chapterId, dataSaver).catch(() => [] as string[]),
     chapter.mangaId ? getChapters(chapter.mangaId, chapter.language).catch(() => []) : Promise.resolve([]),
-    anilistId ? getManga(anilistId).catch(() => null) : Promise.resolve(null),
+    anilistId
+      ? getManga(anilistId).then((s) => ({ id: anilistId, title: displayTitle(s), cover: s.coverImage.large }), () => null)
+      : mdOnly
+        ? getMdTitle(chapter.mangaId!).then((t) => (t ? { id: key!, title: t.title, cover: t.cover ?? "" } : null), () => null)
+        : Promise.resolve(null),
   ]);
   // every page goes through our proxy (see app/api/page/route.ts)
   const proxiedPages = pages.map((u) => `/api/page?u=${encodeURIComponent(u)}`);
   const i = list.findIndex((c) => c.id === chapterId || (chapter.chapter && c.chapter === chapter.chapter));
   const prev = i > 0 ? list[i - 1] : null;
   const next = i >= 0 && i < list.length - 1 ? list[i + 1] : null;
-  const back = anilistId ? `/manga/${anilistId}` : "/browse";
+  const back = anilistId ? `/manga/${anilistId}` : chapter.mangaId ? `/title/${chapter.mangaId}` : "/browse";
   const qs = (extra: Record<string, string>) => new URLSearchParams({ ...(m ? { m } : {}), ...extra }).toString();
   const href = (id: string) => `/read/${id}?${qs(dataSaver ? { saver: "1" } : {})}`;
 
@@ -54,7 +61,7 @@ export default async function ReadPage({
       chapterNum={chapter.chapter}
       pages={proxiedPages}
       startPage={Math.max(0, Number(p) || 0)}
-      series={series && anilistId ? { id: anilistId, title: displayTitle(series), cover: series.coverImage.large } : null}
+      series={series}
       title={`Chapter ${chapter.chapter ?? "?"}${chapter.title ? `: ${chapter.title}` : ""}`}
       backHref={back}
       prevHref={prev ? href(prev.id) : null}

@@ -3,6 +3,7 @@
 // and keep serving the last good data if AniList is briefly down.
 
 import { cached, fetchRetry } from "./cache";
+import { lookup } from "./catalog";
 
 const ENDPOINT = "https://graphql.anilist.co";
 
@@ -24,6 +25,10 @@ export interface Media {
   countryOfOrigin: string | null;
   startDate: { year: number | null };
   trending?: number;
+  /** has English chapters on MangaDex, per the catalog index */
+  readable?: boolean;
+  /** overrides the /manga/[id] link (MangaDex-only titles) */
+  href?: string;
 }
 
 export interface MediaDetail extends Media {
@@ -109,7 +114,8 @@ export interface ListOptions {
 // AniList's isAdult:false filter currently returns empty first pages for many queries,
 // so adult titles are excluded by genre in the query and by flag afterwards.
 const NOT_ADULT = `genre_not_in:["Hentai"]`;
-const safe = (list: Media[]) => list.filter((m) => !m.isAdult);
+const safe = (list: Media[]) => list.filter((m) => !m.isAdult).map(withReadable);
+const withReadable = <T extends Media>(m: T): T => ({ ...m, readable: lookup(m.id, m.idMal)?.english ?? false });
 
 const LIST_ARGS = `type:MANGA, ${NOT_ADULT}, sort:$sort, genre:$genre, countryOfOrigin:$country, search:$search, status:$status`;
 
@@ -166,7 +172,10 @@ export async function getManga(id: number) {
     { id },
   );
   const m = data.Media;
-  return { ...m, recommendations: { nodes: m.recommendations.nodes.filter((n) => !n.mediaRecommendation?.isAdult) } };
+  return {
+    ...withReadable(m),
+    recommendations: { nodes: m.recommendations.nodes.filter((n) => n.mediaRecommendation && !n.mediaRecommendation.isAdult).map((n) => ({ mediaRecommendation: withReadable(n.mediaRecommendation!) })) },
+  };
 }
 
 export async function getGenres() {

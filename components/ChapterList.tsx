@@ -2,10 +2,22 @@ import Link from "next/link";
 import ChapterGrid from "./ChapterGrid";
 import { findMangaDex, getChapters, LANG_NAMES } from "@/lib/mangadex";
 
-export default async function ChapterList({ anilistId, titles, color, lang }: { anilistId: number; titles: string[]; color: string; lang: string }) {
+export default async function ChapterList({
+  anilistId,
+  malId,
+  titles,
+  color,
+  lang,
+}: {
+  anilistId: number;
+  malId: number | null;
+  titles: string[];
+  color: string;
+  lang: string;
+}) {
   let md;
   try {
-    md = await findMangaDex(anilistId, titles);
+    md = await findMangaDex(anilistId, titles, malId);
   } catch (err) {
     console.warn("[chapters] MangaDex lookup failed", anilistId, (err as Error).message);
     md = null;

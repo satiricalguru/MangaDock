@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface Result {
-  id: number;
+  id: number | string;
+  href: string;
+  readable: boolean;
   title: string;
   cover: string;
   year: number | null;
@@ -94,7 +96,7 @@ export default function CommandSearch() {
             onKeyDown={(e) => {
               if (e.key === "ArrowDown") setActive((a) => Math.min(a + 1, results.length - 1));
               if (e.key === "ArrowUp") setActive((a) => Math.max(a - 1, 0));
-              if (e.key === "Enter") go(results[active] ? `/manga/${results[active].id}` : `/browse?q=${encodeURIComponent(q)}`);
+              if (e.key === "Enter") go(results[active] ? results[active].href : `/browse?q=${encodeURIComponent(q)}`);
             }}
             placeholder="Search manga, manhwa, manhua…"
             className="w-full bg-transparent py-5 text-lg outline-none placeholder:text-mist/60"
@@ -111,7 +113,7 @@ export default function CommandSearch() {
             <li key={r.id}>
               <button
                 onMouseEnter={() => setActive(i)}
-                onClick={() => go(`/manga/${r.id}`)}
+                onClick={() => go(r.href)}
                 className={`flex w-full items-center gap-4 rounded-2xl p-2.5 text-left transition ${i === active ? "bg-white/10" : ""}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -122,6 +124,7 @@ export default function CommandSearch() {
                     {LABEL[r.country ?? "JP"] ?? "Manga"}
                     {r.year ? ` · ${r.year}` : ""}
                     {r.score ? ` · ★ ${r.score / 10}` : ""}
+                    {r.readable && <span className="text-lime"> · Read here</span>}
                   </span>
                 </span>
                 <span className="h-2 w-2 rounded-full" style={{ background: r.color ?? "#ff2e95" }} />

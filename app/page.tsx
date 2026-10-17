@@ -7,6 +7,7 @@ import ContinueRail from "@/components/ContinueRail";
 import { COUNTRY_LABEL, displayTitle, listMany, plainText, type Media } from "@/lib/anilist";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
 import { proxied } from "@/lib/img";
+import { listMangaDex, mdAsMedia } from "@/lib/mangadex";
 
 // Rendered per request; the shared API cache keeps it fast and stops a failed
 // fetch from being frozen into a static page.
@@ -37,8 +38,8 @@ const FEATURES = [
 ];
 
 async function loadHome() {
-  const empty = { trending: [], manhwa: [], releasing: [], manhua: [], topRated: [], completed: [], romance: [], action: [], rising: [] };
-  const [a, b] = await Promise.all([
+  const empty = { trending: [], manhwa: [], releasing: [], manhua: [], topRated: [], completed: [], romance: [], action: [], rising: [], fresh: [] };
+  const [a, b, fresh] = await Promise.all([
     listMany({
       trending: { sort: "TRENDING_DESC", perPage: 20, full: true },
       manhwa: { sort: "TRENDING_DESC", country: "KR", perPage: 16 },
@@ -52,8 +53,10 @@ async function loadHome() {
       romance: { sort: "TRENDING_DESC", genre: "Romance", perPage: 16 },
       action: { sort: "TRENDING_DESC", genre: "Action", perPage: 16 },
     }).catch(() => null),
+    // newest English chapters on MangaDex: everything here opens straight into the reader
+    listMangaDex({ sort: "UPDATED_AT_DESC", perPage: 16 }).then((r) => r.titles.map(mdAsMedia), () => []),
   ]);
-  return { ...empty, ...(a ?? {}), ...(b ?? {}), failed: !a && !b } as Record<keyof typeof empty, Media[]> & { failed: boolean };
+  return { ...empty, ...(a ?? {}), ...(b ?? {}), fresh, failed: !a && !b } as Record<keyof typeof empty, Media[]> & { failed: boolean };
 }
 
 export default async function Home() {
@@ -132,7 +135,7 @@ export default async function Home() {
       {d.trending.length > 0 && (
         <section id="trending" className="relative z-10 scroll-mt-24 px-6 py-16">
           <div className="mx-auto max-w-7xl">
-            <div data-reveal>
+            <div data-reveal suppressHydrationWarning>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan">This week</p>
               <h2 className="mt-2 font-display text-4xl font-black italic sm:text-6xl">Trending top 10</h2>
             </div>
@@ -148,7 +151,7 @@ export default async function Home() {
       {/* GENRES */}
       <section className="relative z-10 px-6 py-16">
         <div className="mx-auto max-w-7xl">
-          <h2 className="font-display text-4xl font-black italic sm:text-6xl" data-reveal>
+          <h2 className="font-display text-4xl font-black italic sm:text-6xl" data-reveal suppressHydrationWarning>
             Pick your <span className="text-neon">vibe</span>
           </h2>
           <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
@@ -156,8 +159,8 @@ export default async function Home() {
               <Link
                 key={g.name}
                 href={`/browse?genre=${encodeURIComponent(g.name)}`}
-                data-reveal
-                className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-3xl p-5 transition duration-500 ease-glide hover:-translate-y-2 hover:rotate-[-1.5deg]"
+                data-reveal suppressHydrationWarning
+                className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-3xl p-5 transition duration-500 ease-glide hover:-translate-y-2 hover:rotate-[-1.5deg] active:scale-95"
                 style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }}
               >
                 <span className="speedlines absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100" />
@@ -171,6 +174,7 @@ export default async function Home() {
       </section>
 
       <div className="relative z-10 bg-gradient-to-b from-transparent via-ink/70 to-ink">
+        <Rail kicker="Readable now" title="Just updated" items={d.fresh} href="/browse?src=md&sort=UPDATED_AT_DESC" />
         <Rail kicker="Korea" title="Hot manhwa" items={d.manhwa} href="/browse?country=KR" />
         <Rail kicker="Japan" title="Ongoing manga" items={d.releasing} href="/browse?country=JP&status=RELEASING" />
         <Rail kicker="China" title="Manhua on the rise" items={d.manhua} href="/browse?country=CN" />
@@ -180,7 +184,7 @@ export default async function Home() {
       <section className="relative z-10 overflow-hidden bg-ink px-6 py-24">
         <div className="pointer-events-none absolute hidden md:block left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-violet/30 blur-[160px]" />
         <div className="relative mx-auto max-w-7xl">
-          <div className="max-w-2xl" data-reveal>
+          <div className="max-w-2xl" data-reveal suppressHydrationWarning>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-magenta">Made for bingeing</p>
             <h2 className="mt-2 font-display text-4xl font-black italic sm:text-6xl">
               A reader that <span className="text-neon">remembers.</span>
@@ -188,7 +192,7 @@ export default async function Home() {
           </div>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
-              <div key={f.title} className="glass group rounded-[28px] p-7 transition duration-500 ease-glide hover:-translate-y-2" data-reveal>
+              <div key={f.title} className="glass group rounded-[28px] p-7 transition duration-500 ease-glide hover:-translate-y-2" data-reveal suppressHydrationWarning>
                 <span className="grid h-14 w-14 place-items-center rounded-2xl text-2xl text-ink transition group-hover:rotate-[-8deg] group-hover:scale-110" style={{ background: f.color }}>
                   {f.icon}
                 </span>
@@ -197,7 +201,7 @@ export default async function Home() {
               </div>
             ))}
           </div>
-          <div className="mt-10 flex flex-wrap gap-3" data-reveal>
+          <div className="mt-10 flex flex-wrap gap-3" data-reveal suppressHydrationWarning>
             <Link href="/login?mode=signup" className="rounded-full bg-paper px-6 py-3 font-semibold text-ink transition hover:bg-lime">
               Create a free account
             </Link>
@@ -209,7 +213,7 @@ export default async function Home() {
       </section>
 
       <div className="relative z-10 bg-ink">
-        <Rail kicker="Fresh chapters" title="Rising this season" items={d.rising} href="/browse?status=RELEASING" />
+        <Rail kicker="Climbing the charts" title="Rising this season" items={d.rising} href="/browse?status=RELEASING" />
         <Rail kicker="All time" title="Highest rated" items={d.topRated} href="/browse?sort=SCORE_DESC" />
         <Rail kicker="Heart eyes" title="Romance picks" items={d.romance} href="/browse?genre=Romance" />
         <Rail kicker="Adrenaline" title="Action that hits" items={d.action} href="/browse?genre=Action" />
@@ -223,7 +227,7 @@ export default async function Home() {
           prefetch={false}
           className="speedlines group relative mx-auto flex max-w-7xl flex-col items-center overflow-hidden rounded-[40px] px-6 py-20 text-center"
           style={{ background: "linear-gradient(120deg, #ff2e95, #6120ee 45%, #99ecff)" }}
-          data-reveal
+          data-reveal suppressHydrationWarning
         >
           <span className="halftone absolute inset-0 opacity-50 mix-blend-overlay" />
           <span className="relative text-6xl transition duration-700 ease-glide group-hover:rotate-[360deg]">🎲</span>
@@ -234,7 +238,7 @@ export default async function Home() {
 
       {/* WHERE TO READ */}
       <section className="relative z-10 overflow-hidden bg-ink py-20">
-        <div className="mx-auto max-w-7xl px-6" data-reveal>
+        <div className="mx-auto max-w-7xl px-6" data-reveal suppressHydrationWarning>
           <h2 className="font-display text-4xl font-black italic sm:text-5xl">Built on the shoulders of giants</h2>
           <p className="mt-3 max-w-2xl text-mist">
             Our catalog comes from open community databases, and chapters are credited to the people who translate them. When a series is licensed, we

@@ -3,6 +3,7 @@ import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
+import Reveal from "@/components/Reveal";
 import CommandSearch from "@/components/CommandSearch";
 import SyncOnLogin from "@/components/SyncOnLogin";
 import { getUser } from "@/lib/auth";
@@ -20,6 +21,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body className="min-h-dvh bg-ink pb-20 lg:pb-0">
         <SmoothScroll />
+        <Reveal />
         <SyncOnLogin userId={user?.id ?? null} />
         <CommandSearch />
         <Nav user={user} />

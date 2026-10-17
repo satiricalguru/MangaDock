@@ -141,7 +141,7 @@ export default async function MangaPage({ params, searchParams }: { params: Prom
                 </div>
               }
             >
-              <ChapterList anilistId={m.id} titles={titles} color={color} lang={lang} />
+              <ChapterList anilistId={m.id} malId={m.idMal} titles={titles} color={color} lang={lang} />
             </Suspense>
           </div>
         </div>

@@ -5,7 +5,7 @@ out
 next-env.d.ts
 *.tsbuildinfo
 .DS_Store
-data
+/data
 test-report
 test-results
 .audit

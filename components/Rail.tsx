@@ -7,7 +7,7 @@ export default function Rail({ title, kicker, items, href }: { title: string; ki
   if (items.length === 0) return null;
   return (
     <section className="relative z-10 py-12">
-      <div className="mx-auto flex max-w-7xl items-end gap-4 px-6" data-reveal>
+      <div className="mx-auto flex max-w-7xl items-end gap-4 px-6" data-reveal suppressHydrationWarning>
         <div>
           {kicker && <p className="text-xs font-semibold uppercase tracking-[0.3em] text-magenta">{kicker}</p>}
           <h2 className="mt-2 font-display text-3xl font-black italic sm:text-4xl">{title}</h2>

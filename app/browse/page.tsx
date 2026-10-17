@@ -1,6 +1,7 @@
 import Link from "next/link";
 import MangaCard from "@/components/MangaCard";
-import { getGenres, listManga, type ListOptions } from "@/lib/anilist";
+import { getGenres, listManga, type ListOptions, type Media } from "@/lib/anilist";
+import { listMangaDex, mdAsMedia } from "@/lib/mangadex";
 
 export const metadata = { title: "Browse" };
 
@@ -9,6 +10,7 @@ const SORTS: { value: NonNullable<ListOptions["sort"]>; label: string }[] = [
   { value: "POPULARITY_DESC", label: "Popular" },
   { value: "SCORE_DESC", label: "Top rated" },
   { value: "START_DATE_DESC", label: "Newest" },
+  { value: "UPDATED_AT_DESC", label: "Just updated" },
 ];
 const COUNTRIES = [
   { value: "", label: "All" },
@@ -17,7 +19,12 @@ const COUNTRIES = [
   { value: "CN", label: "Manhua" },
 ];
 
-type Search = { q?: string; genre?: string; country?: string; sort?: string; status?: string; page?: string };
+type Search = { q?: string; genre?: string; country?: string; sort?: string; status?: string; page?: string; src?: string };
+
+const SOURCES = [
+  { value: "", label: "Everything", hint: "The full AniList catalog" },
+  { value: "md", label: "Readable now", hint: "Only series with English chapters here, from MangaDex" },
+];
 
 export default async function Browse({ searchParams }: { searchParams: Promise<Search> }) {
   const sp = await searchParams;
@@ -26,8 +33,15 @@ export default async function Browse({ searchParams }: { searchParams: Promise<S
   const country = (["JP", "KR", "CN"].includes(sp.country ?? "") ? sp.country : undefined) as ListOptions["country"];
   const status = (sp.status === "RELEASING" || sp.status === "FINISHED" ? sp.status : undefined) as ListOptions["status"];
 
+  const readableOnly = sp.src === "md";
+  const filters = { search: sp.q || undefined, genre: sp.genre || undefined, country, sort, status, page, perPage: 30 };
   const [result, genres] = await Promise.all([
-    listManga({ search: sp.q || undefined, genre: sp.genre || undefined, country, sort, status, page, perPage: 30 }).catch(() => null),
+    readableOnly
+      ? listMangaDex(filters).then(
+          (r) => ({ media: r.titles.map(mdAsMedia) as Media[], pageInfo: { hasNextPage: r.hasNextPage, total: r.total }, unknownGenre: r.unknownGenre }),
+          () => null,
+        )
+      : listManga(filters).then((r) => ({ ...r, unknownGenre: false }), () => null),
     getGenres().catch(() => [] as string[]),
   ]);
 
@@ -52,12 +66,21 @@ export default async function Browse({ searchParams }: { searchParams: Promise<S
             </>
           ) : (
             <>
-              Browse <span className="text-neon">{sp.genre ?? "everything"}</span>
+              {readableOnly ? "Read" : "Browse"} <span className="text-neon">{sp.genre ?? (readableOnly ? "now" : "everything")}</span>
             </>
           )}
         </h1>
 
         <div className="mt-8 space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            {SOURCES.map((x) => (
+              <Link key={x.label} href={href({ src: x.value || undefined })} title={x.hint} className={chip((sp.src ?? "") === x.value)}>
+                {x.value === "md" && <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-lime align-middle" />}
+                {x.label}
+              </Link>
+            ))}
+            <span className="text-xs text-mist">{SOURCES.find((x) => x.value === (sp.src ?? ""))?.hint}</span>
+          </div>
           <div className="flex flex-wrap gap-2">
             {COUNTRIES.map((c) => (
               <Link key={c.label} href={href({ country: c.value || undefined })} className={chip((sp.country ?? "") === c.value)}>
@@ -90,20 +113,24 @@ export default async function Browse({ searchParams }: { searchParams: Promise<S
           </div>
         </div>
 
+        {result?.unknownGenre && <p className="mt-6 text-sm text-amber">MangaDex has no “{sp.genre}” tag, so that filter is ignored here.</p>}
+        {result && result.pageInfo.total > 0 && (
+          <p className="mt-6 text-sm text-mist">{result.pageInfo.total.toLocaleString("en")} series</p>
+        )}
         {!result ? (
           <div className="mt-16 text-mist">
-            <p>Nothing came back from AniList. It sometimes hiccups for a moment.</p>
+            <p>Nothing came back from {readableOnly ? "MangaDex" : "AniList"}. It sometimes hiccups for a moment.</p>
             <Link href={href({ page: sp.page })} className="mt-4 inline-block rounded-full bg-magenta px-5 py-2.5 text-sm font-semibold text-white">
               Try again
             </Link>
           </div>
         ) : result.media.length === 0 ? (
-          <p className="mt-16 text-mist">Nothing matched “{sp.q}”. Try another spelling.</p>
+          <p className="mt-16 text-mist">{sp.q ? <>Nothing matched “{sp.q}”. Try another spelling.</> : "Nothing matches these filters."}</p>
         ) : (
           <>
             <div className="mt-12 grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {result.media.map((m) => (
-                <MangaCard key={m.id} m={m} />
+                <MangaCard key={m.href ?? m.id} m={m} />
               ))}
             </div>
             <div className="mt-14 flex justify-center gap-3">

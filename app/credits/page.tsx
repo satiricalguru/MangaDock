@@ -8,7 +8,7 @@ const SECTIONS: { title: string; blurb: string; items: { name: string; url: stri
       { name: "AniList", url: "https://anilist.co", role: "Catalog: titles, covers, banners, genres, trending and recommendations (GraphQL API)" },
       { name: "MyAnimeList", url: "https://myanimelist.net", role: "Scores and rankings, via the Jikan API" },
       { name: "Jikan", url: "https://jikan.moe", role: "Open-source MyAnimeList API" },
-      { name: "MangaDex", url: "https://mangadex.org", role: "Chapter listings and the in-site reader (MangaDex@Home)" },
+      { name: "MangaDex", url: "https://mangadex.org", role: "Chapters, the in-site reader (MangaDex@Home), the Readable now catalog, and an offline index matching every MangaDex title to AniList" },
       { name: "Scanlation groups", url: "https://mangadex.org/groups", role: "The volunteers who translate chapters. Each one is credited on its chapter." },
     ],
   },
@@ -51,7 +51,7 @@ export default function Credits() {
           Neon Ink is free and ad-free. It hosts no files: everything here is pulled from these communities and platforms, with credit.
         </p>
         {SECTIONS.map((s) => (
-          <section key={s.title} className="mt-16" data-reveal>
+          <section key={s.title} className="mt-16" data-reveal suppressHydrationWarning>
             <h2 className="font-display text-2xl font-black italic">{s.title}</h2>
             <p className="mt-1 text-sm text-mist">{s.blurb}</p>
             <ul className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -66,7 +66,7 @@ export default function Credits() {
             </ul>
           </section>
         ))}
-        <section className="mt-16 rounded-3xl border border-white/10 p-6 text-sm text-mist" data-reveal>
+        <section className="mt-16 rounded-3xl border border-white/10 p-6 text-sm text-mist" data-reveal suppressHydrationWarning>
           <p className="font-semibold text-paper">Takedowns</p>
           <p className="mt-2">
             Scanlation group leaders and rights holders can ask for a chapter to be removed. We follow MangaDex&apos;s policy and honour every request.

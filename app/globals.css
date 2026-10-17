@@ -96,10 +96,8 @@ html.lenis body {
   }
 }
 
-@media (min-width: 768px) and (pointer: fine) {
-  .marquee {
-    animation: marquee 40s linear infinite;
-  }
+.marquee {
+  animation: marquee 40s linear infinite;
 }
 
 /* Scroll-reveal: pure CSS scroll-driven animation, so React-owned markup is never
@@ -124,6 +122,46 @@ html.lenis body {
       animation-range: entry 0% entry 55%;
     }
   }
+}
+
+/* Phones, tablets and older browsers: Reveal.tsx adds data-shown as each element
+   enters the viewport, and this one-shot transition plays. Once it ends the element
+   is a plain element again (no layer kept alive), which keeps iOS WebKit happy. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js-reveal [data-reveal] {
+    transition:
+      opacity 0.8s var(--ease-glide),
+      transform 0.8s var(--ease-glide);
+  }
+  html.js-reveal [data-reveal]:not([data-shown]) {
+    opacity: 0;
+    transform: translateY(32px) scale(0.97);
+  }
+}
+
+/* Phone hero: the still poster drifts slowly, and two rows of trending covers
+   float past behind the headline. Transform-only, three layers in total. */
+@keyframes kenburns {
+  from {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.16) translate3d(-3%, -2%, 0);
+  }
+}
+.kenburns {
+  animation: kenburns 22s ease-in-out infinite alternate;
+}
+@keyframes drift {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.drift {
+  animation: drift 60s linear infinite;
+}
+.drift-reverse {
+  animation: drift 70s linear infinite reverse;
 }
 
 /* Route change: content glides in */
@@ -235,6 +273,9 @@ html.lenis body {
 
 @media (prefers-reduced-motion: reduce) {
   .marquee,
+  .kenburns,
+  .drift,
+  .drift-reverse,
   .text-neon,
   .page-in,
   .route-in,

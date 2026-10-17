@@ -5,7 +5,7 @@ import { COUNTRY_LABEL, displayTitle, type Media } from "@/lib/anilist";
 export default function MangaCard({ m, rank, className = "" }: { m: Media; rank?: number; className?: string }) {
   const color = m.coverImage.color ?? "#ff2e95";
   return (
-    <Link href={`/manga/${m.id}`} className={`block ${className}`} data-reveal>
+    <Link href={m.href ?? `/manga/${m.id}`} className={`block ${className}`} data-reveal suppressHydrationWarning>
       <TiltCard glow={color}>
         <div className="relative aspect-[2/3] bg-ink-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -20,6 +20,11 @@ export default function MangaCard({ m, rank, className = "" }: { m: Media; rank?
             <span className="rounded-full bg-ink/80 px-2 py-1 md:backdrop-blur">{COUNTRY_LABEL[m.countryOfOrigin ?? "JP"] ?? "Manga"}</span>
             {m.averageScore ? <span className="rounded-full px-2 py-1 text-ink" style={{ background: color }}>★ {m.averageScore / 10}</span> : null}
           </div>
+          {m.readable && (
+            <span className="absolute bottom-2 right-2 rounded-full bg-lime px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-ink" title="English chapters available here">
+              Read
+            </span>
+          )}
         </div>
       </TiltCard>
       <p className="mt-3 line-clamp-2 text-sm font-semibold leading-snug">{displayTitle(m)}</p>
