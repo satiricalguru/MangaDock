@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- MangaDock: an open manga volume resting on a dock line, on a night-ink tile -->
+  <defs>
+    <linearGradient id="neon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff2e95"/>
+      <stop offset=".45" stop-color="#ab77ff"/>
+      <stop offset="1" stop-color="#99ecff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".38" r=".7">
+      <stop offset="0" stop-color="#2a1748"/>
+      <stop offset="1" stop-color="#0b0712"/>
+    </radialGradient>
+    <pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2" fill="#ffffff" fill-opacity=".07"/>
+    </pattern>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#glow)"/>
+  <rect width="512" height="512" rx="112" fill="url(#dots)"/>
+  <!-- the book: two pages curving down into the spine -->
+  <path d="M256 186 C214 150 156 136 100 144 V352 C156 344 214 356 256 392 Z" fill="#ff2e95" fill-opacity=".14"
+        stroke="url(#neon)" stroke-width="28" stroke-linejoin="round"/>
+  <path d="M256 186 C298 150 356 136 412 144 V352 C356 344 298 356 256 392 Z" fill="#99ecff" fill-opacity=".12"
+        stroke="url(#neon)" stroke-width="28" stroke-linejoin="round"/>
+  <!-- panel lines on the pages -->
+  <path d="M146 214 C176 210 204 216 222 228 M146 264 C176 260 204 266 222 278 M290 228 C308 216 336 210 366 214 M290 278 C308 266 336 260 366 264"
+        stroke="#fff7fb" stroke-opacity=".75" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <!-- dock line: the shelf the volume rests on -->
+  <path d="M128 420 H384" stroke="#d4ff3a" stroke-width="22" stroke-linecap="round"/>
+</svg>
